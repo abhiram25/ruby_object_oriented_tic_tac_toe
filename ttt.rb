@@ -126,7 +126,7 @@ class TTTGame
 
   def initialize
     @board = Board.new
-    @human = Player.new(HUMAN_MARKER)
+    @human = Human.new(HUMAN_MARKER)
     @computer = Player.new(COMPUTER_MARKER)
     @current_marker = FIRST_TO_MOVE
   end
@@ -176,25 +176,23 @@ class TTTGame
     board.draw
   end
 
- def join_or(array)
-  if array.size > 2
+  def join_or(array)
+   if array.size > 2
     str = array.join(", ")
     str.gsub!(str[-1], "or #{str[-1]}")
-  else
+   else
     str = array.join(" OR ")
+   end
+    str
   end
-  str
-end
 
   def human_moves
-    puts "Choose a square (#{join_or(board.unmarked_keys)})"
     square = nil
     loop do
       square = gets.chomp.to_i
       break if board.unmarked_keys.include?(square)
       puts "Sorry, that's not a valid choice"
     end
-
     board[square] = human.marker
   end
 
@@ -244,6 +242,7 @@ end
 
   def current_player_moves
     if human_turn?
+      puts "Choose a square (#{join_or(board.unmarked_keys)})"
       human_moves
       @current_marker = COMPUTER_MARKER
     else
