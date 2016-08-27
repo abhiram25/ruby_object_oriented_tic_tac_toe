@@ -126,7 +126,7 @@ class TTTGame
 
   def initialize
     @board = Board.new
-    @human = Human.new(HUMAN_MARKER)
+    @human = Player.new(HUMAN_MARKER)
     @computer = Player.new(COMPUTER_MARKER)
     @current_marker = FIRST_TO_MOVE
   end
@@ -197,6 +197,7 @@ class TTTGame
   end
 
   def computer_moves
+    binding.pry
     board[board.unmarked_keys.to_a.sample] = COMPUTER_MARKER
   end
 
