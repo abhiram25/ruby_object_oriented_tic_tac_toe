@@ -135,7 +135,7 @@ class Player
   attr_accessor :score
   attr_reader :marker
 
-  def initialize(marker, score)
+  def initialize(marker)
     @marker = marker
     @score = 0
   end
@@ -150,8 +150,8 @@ class TTTGame
 
   def initialize
     @board = Board.new
-    @human = Player.new(HUMAN_MARKER, 0)
-    @computer = Player.new(COMPUTER_MARKER, 0)
+    @human = Player.new(HUMAN_MARKER)
+    @computer = Player.new(COMPUTER_MARKER)
     @current_marker = FIRST_TO_MOVE
   end
 
@@ -210,13 +210,13 @@ class TTTGame
   end
 
   def join_or(array)
-   if array.size > 2
-    str = array.join(", ")
-    str.gsub!(str[-1], "or #{str[-1]}")
-   else
-    str = array.join(" OR ")
-   end
-    str
+    if array.size > 2
+      str = array.join(", ")
+      str.gsub!(str[-1], "or #{str[-1]}")
+    else
+      str = array.join(" OR ")
+    end
+      str
   end
 
   def human_moves
@@ -256,7 +256,6 @@ class TTTGame
   def display_score
     puts "Human: #{human.score}  Computer: #{computer.score}"
   end
-
 
   def play_again?
     answer = nil
