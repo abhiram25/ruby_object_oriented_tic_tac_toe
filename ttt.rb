@@ -33,6 +33,10 @@ class Board
     @squares[num].marker = marker
   end
 
+  def five_is_avaiable
+    @squares[5].marker == INITIAL_MARKER
+  end
+
   def unmarked_keys
     @squares.keys.select { |key| @squares[key].unmarked? }
   end
@@ -229,6 +233,7 @@ class TTTGame
     square = nil
     square ||= board.offense_move
     square ||= board.defense_move
+    square ||= 5 if board.five_is_avaiable
     square ||= board.unmarked_keys.to_a.sample
     board[square] = COMPUTER_MARKER
   end
