@@ -45,6 +45,24 @@ class Board
     !!winning_marker
   end
 
+  def offense_move
+    WINNING_LINES.each do |line|
+      if count_computer_marker(@squares.values_at(*line)) == 2
+        return line.select {|num| @squares[num].marker == INITIAL_MARKER }.first
+      end
+    end
+      nil
+  end
+
+  def defense_move
+    WINNING_LINES.each do |line|
+      if count_human_marker(@squares.values_at(*line)) == 2
+        return line.select {|num| @squares[num].marker == INITIAL_MARKER }.first
+      end
+    end
+      nil
+  end
+
   def count_human_marker(squares)
     squares.collect(&:marker).count(TTTGame::HUMAN_MARKER)
   end
@@ -197,8 +215,11 @@ class TTTGame
   end
 
   def computer_moves
-    binding.pry
-    board[board.unmarked_keys.to_a.sample] = COMPUTER_MARKER
+    square = nil
+    square ||= board.offense_move
+    square ||= board.defense_move
+    square ||= board.unmarked_keys.to_a.sample
+    board[square] = COMPUTER_MARKER
   end
 
   def display_result
