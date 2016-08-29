@@ -51,20 +51,26 @@ class Board
 
   def offense_move
     WINNING_LINES.each do |line|
-      if count_computer_marker(@squares.values_at(*line)) == 2
-        return line.select {|num| @squares[num].marker == INITIAL_MARKER }.first
+      if count_computer_marker(@squares.values_at(*line)) == 2 &&
+         count_initial_marker(@squares.values_at(*line)) == 1
+        return line.select { |num| @squares[num].marker == INITIAL_MARKER }.first
       end
     end
-      nil
+    nil
   end
 
   def defense_move
     WINNING_LINES.each do |line|
-      if count_human_marker(@squares.values_at(*line)) == 2
-        return line.select {|num| @squares[num].marker == INITIAL_MARKER }.first
+      if count_human_marker(@squares.values_at(*line)) == 2 &&
+         count_initial_marker(@squares.values_at(*line)) == 1
+        return line.select { |num| @squares[num].marker == INITIAL_MARKER }.first
       end
     end
-      nil
+    nil
+  end
+
+  def count_initial_marker(squares)
+    squares.collect(&:marker).count(INITIAL_MARKER)
   end
 
   def count_human_marker(squares)
@@ -133,59 +139,81 @@ end
 
 class Player
   attr_accessor :score
-  attr_reader :marker
+  attr_reader :marker, :name
 
-  def initialize(marker)
+  def initialize(marker, name)
     @marker = marker
+    @name = name
     @score = 0
   end
 end
 
 class TTTGame
-  HUMAN_MARKER = "X".freeze
-  COMPUTER_MARKER = "O".freeze
-  FIRST_TO_MOVE = HUMAN_MARKER
+  attr_reader :board
+  attr_accessor :human, :computer
 
-  attr_reader :board, :human, :computer
+  name = nil
+
+  loop do
+    puts "What is your name?"
+    name = gets.chomp.capitalize
+    break if !name.strip.empty?
+    puts "Please Enter a valid name"
+  end
+
+  NAME = name
+
+  COMPUTER_NAME = %w(Tom Ryan Chaz).sample
+
+  puts ""
+  puts "Hi #{NAME}, Welcome to Tic Tac Toe!"
+  puts ""
+
+  option = nil
+
+  loop do
+    puts "Would you like to be X or O?"
+    option = gets.chomp.upcase
+    break if %(X O).include?(option)
+    puts "Please type in X or O"
+  end
+
+  HUMAN_MARKER = option.freeze
+
+  if HUMAN_MARKER == "X"
+    COMPUTER_MARKER = "O".freeze
+    FIRST_TO_MOVE = HUMAN_MARKER
+  else
+    COMPUTER_MARKER = "X".freeze
+    FIRST_TO_MOVE = COMPUTER_MARKER
+  end
 
   def initialize
     @board = Board.new
-    @human = Player.new(HUMAN_MARKER)
-    @computer = Player.new(COMPUTER_MARKER)
+    @human = Player.new(HUMAN_MARKER, NAME)
+    @computer = Player.new(COMPUTER_MARKER, COMPUTER_NAME)
     @current_marker = FIRST_TO_MOVE
   end
 
   def play
     clear
-    display_welcome_message
-
     loop do
+      display_board_and_score
       loop do
-        display_board
-        loop do
-          current_player_moves
-          break if board.someone_won? || board.full?
-          clear_screen_and_display_board if human_turn?
-        end
-        display_result_and_update_score
-        display_score
-        break if champion?(computer, human)
-        next_game
+        current_player_moves
+        break if board.someone_won? || board.full?
+        clear_screen_and_display_board if human_turn?
       end
-        break unless play_again?
-        game = TTTGame.new
-        game.play
+      display_result_and_update_score
+      display_score
+      break if champion?(computer, human)
+      break unless play_again?
+      next_game
     end
-
     display_goodbye_message
   end
 
   private
-
-  def display_welcome_message
-    puts "Welcome to Tic Tac Toe!"
-    puts ""
-  end
 
   def display_goodbye_message
     puts "Thank you for playing. Goodbye!"
@@ -195,8 +223,11 @@ class TTTGame
     computer.score == 5 || human.score == 5
   end
 
-  def display_board
-    puts "You're an #{human.marker} Computer is an #{computer.marker}"
+  def display_board_and_score
+    puts "#{human.name} is #{human.marker}"
+    puts "#{computer.name} is #{computer.marker}"
+    puts ""
+    display_score
     puts ""
     board.draw
     puts ""
@@ -204,9 +235,7 @@ class TTTGame
 
   def clear_screen_and_display_board
     clear
-    puts "You're an #{human.marker} Computer is an #{computer.marker}"
-    puts ""
-    board.draw
+    display_board_and_score
   end
 
   def join_or(array)
@@ -216,7 +245,7 @@ class TTTGame
     else
       str = array.join(" OR ")
     end
-      str
+    str
   end
 
   def human_moves
@@ -243,10 +272,10 @@ class TTTGame
 
     case board.winning_marker
     when human.marker
-      puts "You won!"
+      puts "#{human.name} won!"
       human.score += 1
     when computer.marker
-      puts "Computer won!"
+      puts "#{computer.name} won!"
       computer.score += 1
     else
       puts "It's a tie"
@@ -254,7 +283,7 @@ class TTTGame
   end
 
   def display_score
-    puts "Human: #{human.score}  Computer: #{computer.score}"
+    puts "#{human.name}: #{human.score}  #{computer.name}: #{computer.score}"
   end
 
   def play_again?
@@ -265,7 +294,6 @@ class TTTGame
       break if %(y n).include?(answer)
       puts "Sorry, must be y or n"
     end
-
     answer == 'y'
   end
 
@@ -274,6 +302,7 @@ class TTTGame
   end
 
   def next_game
+    clear
     board.reset
     @current_marker = FIRST_TO_MOVE
   end
