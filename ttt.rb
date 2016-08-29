@@ -33,7 +33,7 @@ class Board
     @squares[num].marker = marker
   end
 
-  def five_is_avaiable
+  def five_is_avaiable?
     @squares[5].marker == INITIAL_MARKER
   end
 
@@ -121,24 +121,6 @@ class Square
   def marked?
     marker != INITIAL_MARKER
   end
-
-  def winning_marker
-    WINNING_LINES.each do |line|
-      squares = @squares.values_at(*line)
-      if three_identical_markers?(squares)
-        return squares.first.marker
-      end
-    end
-    nil
-  end
-
-  private
-
-  def three_identical_markers?(squares)
-    markers = squares.select(&:marked?).collect(&:marker)
-    return false if markers.size != 3
-    markers.min == markers.max
-  end
 end
 
 class Player
@@ -178,7 +160,7 @@ class TTTGame
   loop do
     puts "Would you like to be X or O?"
     option = gets.chomp.upcase
-    break if %(X O).include?(option)
+    break if ["X", "O"].include?(option)
     puts "Please type in X or O"
   end
 
@@ -265,7 +247,7 @@ class TTTGame
     square = nil
     square ||= board.offense_move
     square ||= board.defense_move
-    square ||= 5 if board.five_is_avaiable
+    square ||= 5 if board.five_is_avaiable?
     square ||= board.unmarked_keys.to_a.sample
     board[square] = COMPUTER_MARKER
   end
