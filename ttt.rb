@@ -49,11 +49,15 @@ class Board
     !!winning_marker
   end
 
+  def marker(num)
+    @squares[num].marker
+  end
+
   def offense_move
     WINNING_LINES.each do |line|
       if count_computer_marker(@squares.values_at(*line)) == 2 &&
          count_initial_marker(@squares.values_at(*line)) == 1
-        return line.select { |num| @squares[num].marker == INITIAL_MARKER }.first
+        return line.select { |num| marker(num) == INITIAL_MARKER }.first
       end
     end
     nil
@@ -63,7 +67,7 @@ class Board
     WINNING_LINES.each do |line|
       if count_human_marker(@squares.values_at(*line)) == 2 &&
          count_initial_marker(@squares.values_at(*line)) == 1
-        return line.select { |num| @squares[num].marker == INITIAL_MARKER }.first
+        return line.select { |num| marker(num) == INITIAL_MARKER }.first
       end
     end
     nil
@@ -157,7 +161,7 @@ class TTTGame
   loop do
     puts "What is your name?"
     name = gets.chomp.capitalize
-    break if !name.strip.empty?
+    break if !name.strip.empty? && !/[[:alpha:]]/.match(name).nil?
     puts "Please Enter a valid name"
   end
 
@@ -196,7 +200,6 @@ class TTTGame
   end
 
   def play
-    clear
     loop do
       display_board_and_score
       loop do
@@ -204,8 +207,7 @@ class TTTGame
         break if board.someone_won? || board.full?
         clear_screen_and_display_board if human_turn?
       end
-      display_result_and_update_score
-      display_score
+      display_result_and_score
       break if champion?(computer, human)
       break unless play_again?
       next_game
@@ -224,6 +226,7 @@ class TTTGame
   end
 
   def display_board_and_score
+    clear
     puts "#{human.name} is #{human.marker}"
     puts "#{computer.name} is #{computer.marker}"
     puts ""
@@ -267,19 +270,27 @@ class TTTGame
     board[square] = COMPUTER_MARKER
   end
 
-  def display_result_and_update_score
+  def display_result_and_score
     clear_screen_and_display_board
-
     case board.winning_marker
     when human.marker
-      puts "#{human.name} won!"
-      human.score += 1
+      human_wins
     when computer.marker
-      puts "#{computer.name} won!"
-      computer.score += 1
+      computer_wins
     else
       puts "It's a tie"
     end
+    display_score
+  end
+
+  def human_wins
+    puts "#{human.name} won!"
+    human.score += 1
+  end
+
+  def computer_wins
+    puts "#{computer.name} won!"
+    computer.score += 1
   end
 
   def display_score
