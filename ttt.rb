@@ -145,10 +145,32 @@ class Player
   attr_accessor :score
   attr_reader :marker, :name
 
-  def initialize(marker, name)
+  def initialize(marker)
     @marker = marker
-    @name = name
     @score = 0
+  end
+end
+
+class Human < Player
+  player_name = nil
+
+  loop do
+    puts "What is your name?"
+    player_name = gets.chomp.capitalize
+    break if !name.strip.empty? && !/[[:alpha:]]/.match(name).nil?
+    puts "Please Enter a valid name"
+  end
+
+  def initialize(marker, name=player_name)
+    super(marker)
+  end
+end
+
+class Computer < Player
+  computer_name = %w(Tom Ryan Chaz).sample
+
+  def initialize(marker, name=computer_name)
+    super(marker)
   end
 end
 
@@ -156,22 +178,9 @@ class TTTGame
   attr_reader :board
   attr_accessor :human, :computer
 
-  name = nil
-
-  loop do
-    puts "What is your name?"
-    name = gets.chomp.capitalize
-    break if !name.strip.empty? && !/[[:alpha:]]/.match(name).nil?
-    puts "Please Enter a valid name"
-  end
-
-  NAME = name
-
-  COMPUTER_NAME = %w(Tom Ryan Chaz).sample
-
-  puts ""
-  puts "Hi #{NAME}, Welcome to Tic Tac Toe!"
-  puts ""
+  # puts ""
+  # puts "Hi #{NAME}, Welcome to Tic Tac Toe!"
+  # puts ""
 
   option = nil
 
@@ -194,8 +203,8 @@ class TTTGame
 
   def initialize
     @board = Board.new
-    @human = Player.new(HUMAN_MARKER, NAME)
-    @computer = Player.new(COMPUTER_MARKER, COMPUTER_NAME)
+    @human = Human.new(HUMAN_MARKER)
+    @computer = Computer.new(COMPUTER_MARKER, COMPUTER_NAME)
     @current_marker = FIRST_TO_MOVE
   end
 
