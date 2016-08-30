@@ -151,38 +151,47 @@ class TTTGame
 
   def self.display_welcome_message
     puts ""
-    puts "Hi #{@@name}, Welcome to Tic Tac Toe!"
+    puts "Hi #{NAME}, Welcome to Tic Tac Toe!"
     puts ""
   end
 
-  @@name = prompt_for_name
+  def self.prompt_for_marker
+    option = nil
+
+    loop do
+      puts "Would you like to be X or O?"
+      option = gets.chomp.upcase
+      break if %(X O).include?(option)
+      puts "Please type in X or O"
+    end
+    option
+  end
+
+  def self.choose
+    option = prompt_for_marker
+    human_marker = option.freeze
+
+    if human_marker == "X"
+      computer_marker = "O".freeze
+      first_to_move = human_marker
+    else
+      computer_marker = "X".freeze
+      first_to_move = computer_marker
+    end
+    return first_to_move, human_marker, computer_marker
+  end
+
+  NAME = prompt_for_name
 
   display_welcome_message
 
+  FIRST_TO_MOVE, HUMAN_MARKER, COMPUTER_MARKER = choose
+
   COMPUTER_NAME = %w(Tom Ryan Chaz).sample
-
-  option = nil
-
-  loop do
-    puts "Would you like to be X or O?"
-    option = gets.chomp.upcase
-    break if ["X", "O"].include?(option)
-    puts "Please type in X or O"
-  end
-
-  HUMAN_MARKER = option.freeze
-
-  if HUMAN_MARKER == "X"
-    COMPUTER_MARKER = "O".freeze
-    FIRST_TO_MOVE = HUMAN_MARKER
-  else
-    COMPUTER_MARKER = "X".freeze
-    FIRST_TO_MOVE = COMPUTER_MARKER
-  end
 
   def initialize
     @board = Board.new
-    @human = Player.new(HUMAN_MARKER, @@name)
+    @human = Player.new(HUMAN_MARKER, NAME)
     @computer = Player.new(COMPUTER_MARKER, COMPUTER_NAME)
     @current_marker = FIRST_TO_MOVE
   end
