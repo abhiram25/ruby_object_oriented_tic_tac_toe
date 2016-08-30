@@ -149,13 +149,17 @@ class TTTGame
     name
   end
 
-  NAME = prompt_for_name
+  def self.display_welcome_message
+    puts ""
+    puts "Hi #{@@name}, Welcome to Tic Tac Toe!"
+    puts ""
+  end
+
+  @@name = prompt_for_name
+
+  display_welcome_message
 
   COMPUTER_NAME = %w(Tom Ryan Chaz).sample
-
-  puts ""
-  puts "Hi #{NAME}, Welcome to Tic Tac Toe!"
-  puts ""
 
   option = nil
 
@@ -178,7 +182,7 @@ class TTTGame
 
   def initialize
     @board = Board.new
-    @human = Player.new(HUMAN_MARKER, NAME)
+    @human = Player.new(HUMAN_MARKER, @@name)
     @computer = Player.new(COMPUTER_MARKER, COMPUTER_NAME)
     @current_marker = FIRST_TO_MOVE
   end
