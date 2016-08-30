@@ -124,8 +124,8 @@ class Square
 end
 
 class Player
-  attr_accessor :score
-  attr_reader :marker, :name
+  attr_accessor :score, :name
+  attr_reader :marker
 
   def initialize(marker, name)
     @marker = marker
@@ -138,16 +138,18 @@ class TTTGame
   attr_reader :board
   attr_accessor :human, :computer
 
-  name = nil
-
-  loop do
-    puts "What is your name?"
-    name = gets.chomp.capitalize
-    break if !name.strip.empty? && !/[[:alpha:]]/.match(name).nil?
-    puts "Please Enter a valid name"
+  def self.prompt_for_name
+    name = nil
+    loop do
+      puts "What is your name?"
+      name = gets.chomp.capitalize
+      break if !name.strip.empty? && !/[[:alpha:]]/.match(name).nil?
+      puts "Please Enter a valid name"
+    end
+    name
   end
 
-  NAME = name
+  NAME = prompt_for_name
 
   COMPUTER_NAME = %w(Tom Ryan Chaz).sample
 
